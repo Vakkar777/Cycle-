@@ -1,0 +1,17 @@
+solution-sphere/
+├── client/
+│   ├── public/
+│   │   └── index.html (frontend code from previous answer)
+│   └── src/
+│       └── app.js (modified frontend JS with API calls)
+├── server/
+│   ├── server.js (secure backend)
+│   ├── config/
+│   │   └── env.js (environment variables)
+│   ├── middleware/
+│   │   ├── auth.js
+│   │   └── security.js
+│   └── routes/
+│       └── api.js
+├── package.json
+└── .env
