@@ -1,6 +1,271 @@
-<!DOCTYPE html> <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<link rel="stylesheet" href="style.css"> </head> <body>
-<div class="container">
-<div class="circle" style="--i:0;"></div> <div class="circle" style="--i:1; "></div> <div class="circle" style="--i:2; "></div> <div class="circle" style="--i:3;"></div> <div class="circle" style="--i:4; "></div> <div class="circle" style="--i:5;"></div> <div class="circle" style="--i:6;"></div> <div class="circle" style="--i:7; "></div> <div class="circle" style="--i:8; "></div> <div class="circle" style="--i:9; "></div> <div class="circle" style="--i:10; "></div> <div class="circle" style="--i:11; "></div> <div class="circle" style="--i:12; "></div> <div class="circle" style="--i: 13;"></div> <div class="circle" style="--i:14; "></div> <div class="circle" style="--i:15; "></div> <div class="circle" style="--i:16; "></div> <div class="circle" style="--i:17; "></div> <div class="circle" style="--i:18; "></div> <div class="circle" style="--i:19; "></div> <div class="circle" style="--i:20; "></div> </div>
-</body> </html>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SolutionSphere - AI Problem Solver</title>
+    <style>
+        /* Base Styles */
+        :root {
+            --primary: #4A90E2;
+            --secondary: #50E3C2;
+            --background: #F8F9FF;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--background);
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 2rem 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        /* Input Section */
+        .input-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        #problemInput {
+            width: 100%;
+            height: 150px;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: var(--primary);
+            color: white;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Solution Display */
+        .solution-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .solution-steps {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+        }
+
+        .solution-step {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 4px solid var(--primary);
+            background: #f8fafd;
+        }
+
+        .visual-aid {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        /* Toggles */
+        .toggle-container {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .toggle {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            background: #eee;
+            cursor: pointer;
+        }
+
+        .toggle.active {
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔍 SolutionSphere</h1>
+            <p><em>"From glitches to goals, we crack every code."</em></p>
+        </header>
+
+        <div class="input-section">
+            <textarea id="problemInput" placeholder="Describe your problem... (e.g., 'My phone won't charge')"></textarea>
+            
+            <div class="controls">
+                <button onclick="startVoiceInput()">🎤 Voice Input</button>
+                <input type="file" id="fileUpload" hidden>
+                <button onclick="document.getElementById('fileUpload').click()">📁 Upload Files</button>
+                <button onclick="analyzeProblem()">Solve It!</button>
+            </div>
+
+            <div class="toggle-container">
+                <div class="toggle" onclick="toggleComplexity()">🧒 ELI5 Mode</div>
+                <div class="toggle" onclick="toggleStrategy()">💡 Solution Strategy</div>
+            </div>
+        </div>
+
+        <div id="solutionOutput" style="display: none;">
+            <div class="solution-section">
+                <div class="solution-steps">
+                    <h2>Step-by-Step Solution</h2>
+                    <div id="stepsContainer"></div>
+                    
+                    <div id="followupSection">
+                        <h3>Follow-up Questions</h3>
+                        <input type="text" id="followupQuestion" placeholder="Ask something...">
+                        <button onclick="handleFollowup()">Ask</button>
+                    </div>
+                </div>
+
+                <div class="visual-aid">
+                    <h3>Visual Guide</h3>
+                    <div id="visualContent"></div>
+                </div>
+            </div>
+
+            <div class="feedback-section">
+                <h3>Was this helpful?</h3>
+                <button onclick="sendFeedback(1)">👍 Yes</button>
+                <button onclick="sendFeedback(0)">👎 No</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock AI System
+        const mockAI = {
+            solve: (problem) => {
+                return {
+                    steps: [
+                        "1. Check physical connections",
+                        "2. Restart affected device",
+                        "3. Update software/drivers",
+                        "4. Contact professional support"
+                    ],
+                    visual: "📊 Chart showing problem-solving flow",
+                    strategy: "balanced"
+                };
+            }
+        };
+
+        // State Management
+        let currentSolution = null;
+        let eli5Mode = false;
+        let currentStrategy = 'balanced';
+
+        // Core Functions
+        function analyzeProblem() {
+            const problem = document.getElementById('problemInput').value;
+            const solution = mockAI.solve(problem);
+            currentSolution = solution;
+            
+            displaySolution(solution);
+            document.getElementById('solutionOutput').style.display = 'block';
+        }
+
+        function displaySolution(solution) {
+            const stepsContainer = document.getElementById('stepsContainer');
+            const visualContent = document.getElementById('visualContent');
+            
+            stepsContainer.innerHTML = solution.steps
+                .map(step => `<div class="solution-step">${eli5Mode ? simplifyText(step) : step}</div>`)
+                .join('');
+            
+            visualContent.textContent = solution.visual;
+        }
+
+        // Helper Functions
+        function simplifyText(text) {
+            return text.replace("software/drivers", "device apps")
+                      .replace("professional support", "expert helper");
+        }
+
+        function toggleComplexity() {
+            eli5Mode = !eli5Mode;
+            document.querySelector('.toggle:nth-child(1)').classList.toggle('active');
+            if(currentSolution) displaySolution(currentSolution);
+        }
+
+        function toggleStrategy() {
+            currentStrategy = currentStrategy === 'balanced' ? 'quick' : 'balanced';
+            document.querySelector('.toggle:nth-child(2)').classList.toggle('active');
+            // Implement strategy switching logic
+        }
+
+        // Voice Input
+        function startVoiceInput() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("Voice input not supported in your browser");
+                return;
+            }
+
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('problemInput').value = transcript;
+            };
+
+            recognition.start();
+        }
+
+        // File Handling
+        document.getElementById('fileUpload').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                alert(`File ready for analysis: ${file.name}`);
+            }
+        });
+
+        // Feedback System
+        function sendFeedback(isHelpful) {
+            alert(`Feedback received: ${isHelpful ? 'Helpful' : 'Not helpful'}`);
+            // Would normally send to backend
+        }
+    </script>
+</body>
+</html>
